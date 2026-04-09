@@ -1,10 +1,96 @@
-<div class="container">
-    <div class="logo-area">CS-CUT</div>
-    <h1>모의고사 등급컷 조회</h1>
-    <p class="subtitle">연도와 시험을 선택하여 확인해보세요.</p>
-    
-    <div style="text-align: left; margin-bottom: 25px;">
-        <label class="input-group-label">시험 선택</label>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS-CUT | 등급컷 간편 조회</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --bg-gradient: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #2d3436;
+            --text-sub: #636e72;
+            --border: #dfe6e9;
+            --shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            --shadow-sm: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
+
+        body {
+            background: var(--bg-gradient);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-main);
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 50px 40px;
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            width: 100%;
+            max-width: 500px; /* 테이블을 위해 살짝 넓힘 */
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo-area {
+            font-size: 1rem; font-weight: 700; color: var(--primary);
+            letter-spacing: 2px; margin-bottom: 10px; display: inline-block;
+            border-bottom: 2px solid var(--primary); padding-bottom: 2px;
+        }
+
+        h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
+        .subtitle { color: var(--text-sub); margin-bottom: 40px; }
+
+        .select-area { display: flex; gap: 15px; margin-bottom: 30px; }
+        
+        select {
+            flex: 1; padding: 16px; border: 2px solid var(--border);
+            border-radius: 12px; font-size: 1rem; background-color: white;
+            cursor: pointer; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23636e72' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: calc(100% - 16px) center;
+        }
+
+        button {
+            width: 100%; padding: 18px; border: none; border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white; font-size: 1.1rem; font-weight: 700; cursor: pointer;
+            box-shadow: var(--shadow-sm); transition: all 0.3s ease;
+        }
+
+        button:hover { transform: scale(1.02); opacity: 0.9; }
+
+        /* 결과 테이블 스타일 */
+        .result-container {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            display: none; /* 초기엔 숨김 */
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { color: var(--text-sub); font-size: 0.85rem; padding: 10px; border-bottom: 2px solid var(--primary); }
+        td { padding: 12px 10px; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+        .subject-name { font-weight: 600; text-align: left; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="logo-area">CS-CUT</div>
+        <h1>모의고사 등급컷 조회</h1>
+        <p class="subtitle">연도와 시험을 선택하여 확인해보세요.</p>
+        
         <div class="select-area">
             <select id="yearSelect">
                 <option value="2025" selected>2025년</option>
@@ -14,59 +100,70 @@
                 <option value="2021">2021년</option>
                 <option value="2020">2020년</option>
             </select>
+
             <select id="examSelect">
                 <option value="6월">6월 모평</option>
                 <option value="9월">9월 모평</option>
                 <option value="수능">11월(수능)</option>
             </select>
         </div>
-    </div>
-    <button onclick="searchGrade()">등급컷 조회하기</button>
 
-    <div id="resultArea" style="margin-top: 30px; display: none;">
-        <table style="width:100%; border-collapse: collapse; font-size: 0.9rem;">
-            <thead>
-                <tr style="border-bottom: 2px solid var(--primary);">
-                    <th style="padding: 10px;">과목</th>
-                    <th>1컷</th><th>2컷</th><th>3컷</th>
-                </tr>
-            </thead>
-            <tbody id="resultBody"></tbody>
-        </table>
-    </div>
-</div>
+        <button onclick="searchGrade()">등급컷 조회하기</button>
 
-<script>
-    async function searchGrade() {
-        const year = document.getElementById('yearSelect').value;
-        const exam = document.getElementById('examSelect').value;
-        
-        try {
-            const response = await fetch(`/api/grade-cuts?year=${year}&exam_type=${exam}`);
-            const data = await response.json();
-            
+        <div id="resultArea" class="result-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">과목</th>
+                        <th>1등급</th>
+                        <th>2등급</th>
+                        <th>3등급</th>
+                    </tr>
+                </thead>
+                <tbody id="resultBody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function searchGrade() {
+            const year = document.getElementById('yearSelect').value;
+            const exam = document.getElementById('examSelect').value;
             const resultArea = document.getElementById('resultArea');
             const resultBody = document.getElementById('resultBody');
-            resultBody.innerHTML = '';
 
-            if (data.length === 0) {
-                alert("해당 데이터가 없습니다.");
-                resultArea.style.display = 'none';
-                return;
+            try {
+                // 백엔드 API 호출 (Relative Path 사용)
+                const response = await fetch(`/api/grade-cuts?year=${year}&exam_type=${exam}`);
+                const data = await response.json();
+
+                if (data.length === 0) {
+                    alert("아직 등록된 등급컷 데이터가 없습니다.");
+                    resultArea.style.display = 'none';
+                    return;
+                }
+
+                resultBody.innerHTML = '';
+                data.forEach(item => {
+                    const row = `
+                        <tr>
+                            <td class="subject-name">${item.subject}</td>
+                            <td>${item.grade_1 || '-'}</td>
+                            <td>${item.grade_2 || '-'}</td>
+                            <td>${item.grade_3 || '-'}</td>
+                        </tr>
+                    `;
+                    resultBody.innerHTML += row;
+                });
+
+                resultArea.style.display = 'block'; // 결과창 보여주기
+
+            } catch (error) {
+                console.error("Error:", error);
+                alert("데이터를 가져오는 중 오류가 발생했습니다.");
             }
-
-            data.forEach(item => {
-                const row = `<tr>
-                    <td style="padding: 10px; border-bottom: 1px solid var(--border);">${item.subject}</td>
-                    <td style="border-bottom: 1px solid var(--border);">${item.grade_1}</td>
-                    <td style="border-bottom: 1px solid var(--border);">${item.grade_2}</td>
-                    <td style="border-bottom: 1px solid var(--border);">${item.grade_3}</td>
-                </tr>`;
-                resultBody.innerHTML += row;
-            });
-            resultArea.style.display = 'block';
-        } catch (e) {
-            alert("서버와 통신 중 오류가 발생했습니다.");
         }
-    }
-</script>
+    </script>
+</body>
+</html>
